@@ -1,0 +1,14 @@
+<div class="viewer">
+  <div class="buttons">
+    <button (click)="zoomOut()">-</button>
+    <button (click)="zoomReset()">{{zoom$ | async | percent}}</button>
+    <button (click)="zoomIn()">+</button>
+  </div>
+  <div class="pages">
+    <ng-container *ngIf="totalPages$ |async as totalPages">
+      <cdk-virtual-scroll-viewport itemSize="pageItemHeight$ | async" style="height: 100%;">
+        <app-page *cdkVirtualFor="let pageNum of totalPages" [pageNum]="pageNum"></app-page>
+      </cdk-virtual-scroll-viewport>
+    </ng-container>
+  </div>
+</div>

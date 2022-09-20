@@ -1,0 +1,7 @@
+.page {
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  background-color: white;
+  margin: 0 auto;
+}
