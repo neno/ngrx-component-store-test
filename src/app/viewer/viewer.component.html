@@ -1,14 +1,19 @@
 <div class="viewer">
   <div class="buttons">
     <button (click)="zoomOut()">-</button>
-    <button (click)="zoomReset()">{{zoom$ | async | percent}}</button>
+    <button (click)="zoomReset()">{{ zoom$ | async | percent }}</button>
     <button (click)="zoomIn()">+</button>
   </div>
   <div class="pages">
-    <ng-container *ngIf="totalPages$ |async as totalPages">
-      <cdk-virtual-scroll-viewport itemSize="pageItemHeight$ | async" style="height: 100%;">
-        <app-page *cdkVirtualFor="let pageNum of totalPages" [pageNum]="pageNum"></app-page>
-      </cdk-virtual-scroll-viewport>
+    <ng-container *ngIf="allPages$ | async as allPages">
+      <!-- <pre>{{allPages$ | async | json}}</pre> -->
+      <app-page
+        *ngFor="let item of allPages; trackBy: trackByIndex"
+        [pageNum]="item.pageNum"
+        [isVisible]="item.isVisible"
+        intersectionObserver
+        (isIntersecting)="isIntersecting($event, item.pageNum)"
+      ></app-page>
     </ng-container>
   </div>
 </div>

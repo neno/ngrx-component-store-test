@@ -1,6 +1,11 @@
-<ng-container *ngIf="pageNum$ | async as n">
-  <div class="page" [style.width.px]="pageWidth$ | async" [style.height.px]="pageHeight$ | async" [style.marginBottom.px]="marginBottom">
-    <h1>{{n}}</h1>
-  </div>
-</ng-container>
-
+<div
+  class="page"
+  [style.width.px]="pageWidth$ | async"
+  [style.height.px]="pageHeight$ | async"
+  [style.marginBottom.px]="marginBottom"
+>
+  <h1>
+    {{ pageNum }}
+    <p *ngIf="isVisible">isVisible</p>
+  </h1>
+</div>

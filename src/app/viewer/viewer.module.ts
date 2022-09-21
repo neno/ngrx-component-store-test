@@ -4,13 +4,15 @@ import { ScrollingModule } from '@angular/cdk/scrolling'
 import { ViewerComponent } from './viewer.component';
 import { PageComponent } from './page/page.component';
 import { UiStore } from './ui.store';
+import { IntersectionObserverDirective } from '../directives/intersection-observer.directive';
 
 
 
 @NgModule({
   declarations: [
     ViewerComponent,
-    PageComponent
+    PageComponent,
+    IntersectionObserverDirective
   ],
   providers: [
     UiStore

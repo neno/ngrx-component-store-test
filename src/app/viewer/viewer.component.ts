@@ -1,16 +1,31 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { AfterContentInit, AfterViewInit, Component, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { Observable, of, BehaviorSubject, combineLatest, map } from 'rxjs';
+import { PageComponent } from './page/page.component';
 import { UiStore } from './ui.store';
+
+interface IPageItem {
+  pageNum: number,
+  isVisible: boolean
+}
 
 @Component({
   selector: 'app-viewer',
   templateUrl: './viewer.component.html',
   styleUrls: ['./viewer.component.css'],
 })
-export class ViewerComponent implements OnInit {
+export class ViewerComponent
+  implements OnInit, AfterContentInit, AfterViewInit
+{
+  allPages$!: Observable<IPageItem[]>;
   totalPages$!: Observable<number[]>;
+  visiblePagesSubject = new BehaviorSubject<number[]>([]);
+
+  totalPages!: number[];
   pageItemHeight$!: Observable<number>;
   zoom$!: Observable<number>;
+
+  // @ContentChildren(PageComponent) pages: QueryList<PageComponent> | undefined
+  @ViewChildren(PageComponent) pages!: QueryList<PageComponent> | undefined;
 
   constructor(private readonly uiStore: UiStore) {}
 
@@ -24,9 +39,28 @@ export class ViewerComponent implements OnInit {
       actualPageWidth,
       desiredPageHeight,
     });
-    this.totalPages$ = of([...Array(9).keys()].map((n) => n + 1));
+
+    this.totalPages = Array.from({ length: 9 }).map((_, n) => n + 1);
+    this.totalPages$ = of(this.totalPages)
+    this.allPages$ = combineLatest([this.totalPages$, this.visiblePagesSubject]).pipe(
+      map(([totalPages, visiblePages]) => totalPages.map((n) => ({pageNum: n, isVisible: visiblePages.includes(n)})))
+    )
+
     this.pageItemHeight$ = this.uiStore.pageItemHeight$;
     this.zoom$ = this.uiStore.zoom$;
+  }
+
+  ngAfterContentInit(): void {
+    // console.log(this.page);
+    // if (this.page) {
+    // }
+    // if (this.pages) {
+    //   console.log('pages', this.pages);
+    // }
+  }
+
+  ngAfterViewInit(): void {
+    console.log(this.pages?.toArray());
   }
 
   zoomIn() {
@@ -39,5 +73,22 @@ export class ViewerComponent implements OnInit {
 
   zoomReset() {
     this.uiStore.zoomReset();
+  }
+
+  trackByIndex(index: number) {
+    return index;
+  }
+
+  isIntersecting(isVisible: boolean, pageNum: number) {
+
+    if (isVisible) {
+      if (!this.visiblePagesSubject.value.includes(pageNum)) {
+        this.visiblePagesSubject.next([...this.visiblePagesSubject.value, pageNum])
+      }
+    } else {
+      this.visiblePagesSubject.next(this.visiblePagesSubject.value.filter(n => n !== pageNum))
+    }
+
+    console.log('Element #' + pageNum + ' is intersecting ' + isVisible);
   }
 }
